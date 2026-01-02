@@ -1,6 +1,6 @@
+const serverless = require("serverless-http");
 const express = require("express");
 const cors = require("cors");
-const serverless = require("serverless-http");
 const dotenv = require("dotenv");
 
 const connectDB = require("../../config/db");
@@ -9,30 +9,31 @@ const petRoutes = require("../../routes/petRoutes");
 const applicationRoutes = require("../../routes/applicationRoutes");
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
-// ✅ CORS (VERY IMPORTANT)
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use("/auth", authRoutes);
-app.use("/pets", petRoutes);
-app.use("/applications", applicationRoutes);
+/* DB connection */
+connectDB();
 
-// Health
+/* Routes */
+app.use("/api/auth", authRoutes);
+app.use("/api/pets", petRoutes);
+app.use("/api/applications", applicationRoutes);
+
 app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", message: "Netlify backend running" });
+  res.json({ status: "OK", message: "Server is running" });
 });
 
 module.exports.handler = serverless(app);
