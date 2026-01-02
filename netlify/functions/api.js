@@ -14,19 +14,21 @@ connectDB();
 const app = express();
 
 // ✅ CORS (VERY IMPORTANT)
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/pets", petRoutes);
-app.use("/api/applications", applicationRoutes);
+app.use("/auth", authRoutes);
+app.use("/pets", petRoutes);
+app.use("/applications", applicationRoutes);
 
 // Health
 app.get("/api/health", (req, res) => {
