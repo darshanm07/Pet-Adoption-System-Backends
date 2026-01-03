@@ -42,24 +42,24 @@ const createApplication = async (req, res) => {
     // Update pet status to Pending
     await Pet.findByIdAndUpdate(req.body.pet, { status: "Pending" });
 
-    const admin = await User.findOne({ role: "admin" });
+    // const admin = await User.findOne({ role: "admin" });
 
-    if (!admin || !admin.fcmToken) {
-      return res.status(500).json({ message: "Admin FCM token not found" });
-    }
+    // if (!admin || !admin.fcmToken) {
+    //   return res.status(500).json({ message: "Admin FCM token not found" });
+    // }
 
-    // Send notification to Admin
-    const adminToken = admin.fcmToken; // The admin's FCM token
+    // // Send notification to Admin
+    // const adminToken = admin.fcmToken; // The admin's FCM token
 
-    const message = {
-      notification: {
-        title: "New Adoption Application",
-        body: `A new application has been submitted for ${pet.name}`,
-      },
-      token: adminToken, // Send notification to the admin
-    };
+    // const message = {
+    //   notification: {
+    //     title: "New Adoption Application",
+    //     body: `A new application has been submitted for ${pet.name}`,
+    //   },
+    //   token: adminToken, // Send notification to the admin
+    // };
 
-    await messaging.send(message);
+    // await messaging.send(message);
 
     res.status(201).json({
       success: true,
@@ -116,19 +116,19 @@ const updateApplicationStatus = async (req, res) => {
     application.reviewedAt = Date.now();
     await application.save();
 
-    // Send notification to the user
-    const userToken = application.user.fcmToken; // Retrieve user's FCM token
-    const userMessage = {
-      notification: {
-        title: `Your application has been ${status}`,
-        body: `Your application for ${
-          application.pet.name
-        } has been ${status.toLowerCase()}. ${adminNotes || ""}`,
-      },
-      token: userToken,
-    };
+    // // Send notification to the user
+    // const userToken = application.user.fcmToken; // Retrieve user's FCM token
+    // const userMessage = {
+    //   notification: {
+    //     title: `Your application has been ${status}`,
+    //     body: `Your application for ${
+    //       application.pet.name
+    //     } has been ${status.toLowerCase()}. ${adminNotes || ""}`,
+    //   },
+    //   token: userToken,
+    // };
 
-    await messaging.send(userMessage);
+    // await messaging.send(userMessage);
 
     // Update pet status
     const pet = await Pet.findById(application.pet);
