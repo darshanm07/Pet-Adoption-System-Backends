@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    fcmToken: String,
+    fcmToken: { type: String },
   },
   {
     timestamps: true,

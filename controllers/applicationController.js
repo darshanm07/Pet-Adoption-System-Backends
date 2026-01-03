@@ -1,5 +1,6 @@
 const Application = require("../models/Application.js");
 const Pet = require("../models/Pet.js");
+const User = require("../models/User.js");
 const messaging = require("../services/firebase.js");
 
 const createApplication = async (req, res) => {
@@ -41,14 +42,21 @@ const createApplication = async (req, res) => {
     // Update pet status to Pending
     await Pet.findByIdAndUpdate(req.body.pet, { status: "Pending" });
 
+    const admin = await User.findOne({ role: "admin" });
+
+    if (!admin || !admin.fcmToken) {
+      return res.status(500).json({ message: "Admin FCM token not found" });
+    }
+
     // Send notification to Admin
-    const adminToken = "Admin_FCM_Token"; // You'll need to get the FCM token of the admin from your database or settings
+    const adminToken = admin.fcmToken; // The admin's FCM token
+
     const message = {
       notification: {
         title: "New Adoption Application",
         body: `A new application has been submitted for ${pet.name}`,
       },
-      token: adminToken,
+      token: adminToken, // Send notification to the admin
     };
 
     await messaging.send(message);
@@ -94,7 +102,9 @@ const getAllApplications = async (req, res) => {
 const updateApplicationStatus = async (req, res) => {
   try {
     const { status, adminNotes } = req.body;
-    const application = await Application.findById(req.params.id);
+    const application = await Application.findById(req.params.id)
+      .populate("user", "fcmToken")
+      .populate("pet", "name");
 
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
